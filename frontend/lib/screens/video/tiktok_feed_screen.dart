@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import '../../theme/app_theme.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../widgets/bottom_nav_bar.dart';
 
 class TikTokFeedScreen extends StatefulWidget {
@@ -13,14 +13,14 @@ class TikTokFeedScreen extends StatefulWidget {
 
 class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
   int _selectedIndex = 0;
 
   // Lista de vídeos mock
   final List<Map<String, dynamic>> _videos = [
     {
-      'videoUrl': 'assets/videos/1.mp4',
-      'thumbnailUrl': 'assets/images/thumbnails/1.jpg',
+      'videoUrl': kIsWeb
+          ? 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'
+          : 'assets/videos/vidio1.mp4',
       'authorName': 'ana.dev',
       'authorAvatar': 'assets/images/profiles/2.jpg',
       'description': 'Meu primeiro vídeo no TikTok! #flutter #dev',
@@ -32,8 +32,9 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
       'isSaved': false,
     },
     {
-      'videoUrl': 'assets/videos/2.mp4',
-      'thumbnailUrl': 'assets/images/thumbnails/2.jpg',
+      'videoUrl': kIsWeb
+          ? 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
+          : 'assets/videos/vidio2.mp4',
       'authorName': 'joao.dev',
       'authorAvatar': 'assets/images/profiles/1.jpg',
       'description': 'Coding in Flutter is amazing! 🚀 #flutter #coding',
@@ -98,9 +99,7 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
         controller: _pageController,
         scrollDirection: Axis.vertical,
         onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
+          // No state update needed since we're not using the page index
         },
         itemCount: _videos.length,
         itemBuilder: (context, index) {
@@ -185,7 +184,13 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
 
   Future<void> _initializeVideo() async {
     try {
-      _controller = VideoPlayerController.asset(widget.videoUrl);
+      if (kIsWeb) {
+        // Para web, vamos usar uma URL direta do vídeo
+        _controller = VideoPlayerController.network(widget.videoUrl);
+      } else {
+        // Para mobile, usamos o asset
+        _controller = VideoPlayerController.asset(widget.videoUrl);
+      }
 
       // Adiciona listener para erros
       _controller.addListener(() {
@@ -193,6 +198,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
         if (error != null && mounted) {
           setState(() {
             _error = error;
+            print('Erro no player: $error');
           });
         }
       });
@@ -298,10 +304,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.7),
-              ],
+              colors: [Colors.transparent, Colors.black.withAlpha(178)],
             ),
           ),
         ),
@@ -354,27 +357,17 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
               // Descrição
               Text(
                 widget.description,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
               const SizedBox(height: 8),
               // Música
               Row(
                 children: [
-                  const Icon(
-                    Icons.music_note,
-                    color: Colors.white,
-                    size: 16,
-                  ),
+                  const Icon(Icons.music_note, color: Colors.white, size: 16),
                   const SizedBox(width: 4),
                   Text(
                     widget.music,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
                   ),
                   const SizedBox(width: 8),
                   const Icon(
@@ -406,10 +399,7 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
                     const SizedBox(height: 4),
                     Text(
                       '${widget.likes}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),

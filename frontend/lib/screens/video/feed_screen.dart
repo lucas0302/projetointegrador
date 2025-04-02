@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../theme/app_theme.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -11,8 +10,7 @@ class FeedScreen extends StatefulWidget {
 
 class _FeedScreenState extends State<FeedScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
-  
+
   final List<Map<String, dynamic>> _videos = [
     {
       'author': 'Ana Silva',
@@ -32,7 +30,8 @@ class _FeedScreenState extends State<FeedScreen> {
     },
     {
       'author': 'Camila ',
-      'description': 'Aprenda a programar em Flutter em 10 minutos por dia #programação #flutter #dev',
+      'description':
+          'Aprenda a programar em Flutter em 10 minutos por dia #programação #flutter #dev',
       'likes': 3271,
       'comments': 124,
       'shares': 85,
@@ -40,14 +39,15 @@ class _FeedScreenState extends State<FeedScreen> {
     },
     {
       'author': 'Pedro Maker',
-      'description': 'Criando um app do zero - parte 1: wireframes e prototipagem',
+      'description':
+          'Criando um app do zero - parte 1: wireframes e prototipagem',
       'likes': 752,
       'comments': 42,
       'shares': 18,
       'isFollowing': false,
     },
   ];
-  
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +56,7 @@ class _FeedScreenState extends State<FeedScreen> {
       DeviceOrientation.portraitUp,
     ]);
   }
-  
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -72,7 +72,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
   void _onPageChanged(int page) {
     setState(() {
-      _currentPage = page;
+      // _currentPage = page;
     });
   }
 
@@ -133,7 +133,7 @@ class _FeedScreenState extends State<FeedScreen> {
         itemCount: _videos.length,
         itemBuilder: (context, index) {
           final video = _videos[index];
-          
+
           return VideoPage(
             author: video['author'],
             description: video['description'],
@@ -230,7 +230,7 @@ class VideoPage extends StatelessWidget {
             ),
           ),
         ),
-        
+
         // Camada 2: Controles laterais
         Positioned(
           right: 16,
@@ -257,9 +257,9 @@ class VideoPage extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Botão de curtir
               Column(
                 children: [
@@ -281,9 +281,9 @@ class VideoPage extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Botão de comentários
               Column(
                 children: [
@@ -302,9 +302,9 @@ class VideoPage extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Botão de compartilhar
               Column(
                 children: [
@@ -323,9 +323,9 @@ class VideoPage extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Disco girando (simulando música)
               Container(
                 width: 50,
@@ -349,7 +349,7 @@ class VideoPage extends StatelessWidget {
             ],
           ),
         ),
-        
+
         // Camada 3: Informações do vídeo (autor, descrição)
         Positioned(
           left: 16,
@@ -424,4 +424,4 @@ class VideoPage extends StatelessWidget {
       ],
     );
   }
-} 
+}

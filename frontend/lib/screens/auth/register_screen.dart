@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/navigation.dart';
-import '../../widgets/app_button.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
