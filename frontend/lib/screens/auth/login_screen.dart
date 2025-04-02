@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/navigation.dart';
+import '../../services/auth_service.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,12 +16,47 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = AuthService();
+      final response = await authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      // Aqui você pode armazenar o token e os dados do usuário
+      // Por exemplo, usando shared_preferences ou outro gerenciador de estado
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/tiktok');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -58,9 +94,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.zero,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Container branco com os campos
                   Container(
                     padding: const EdgeInsets.all(24),
@@ -90,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         // Subtítulo
                         const Center(
                           child: Text(
@@ -103,9 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Campo Email
                         const Text(
                           'Email',
@@ -138,9 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Campo Senha com "Esqueceu a senha?"
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -158,7 +194,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: AppTheme.primaryPurple,
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
@@ -189,8 +226,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword 
-                                    ? Icons.visibility_outlined 
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                                 color: Colors.grey,
                               ),
@@ -208,49 +245,54 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         // Botão de Entrar
                         SizedBox(
                           width: double.infinity,
                           height: 56,
                           child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                // Implementar lógica de login aqui
-                              }
-                            },
+                            onPressed: _isLoading ? null : _handleLogin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.primaryPurple,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(28),
                               ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Entrar',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        'Entrar',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Icon(
+                                        Icons.arrow_forward,
+                                        color: Colors.white.withOpacity(0.8),
+                                        size: 18,
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Icon(
-                                  Icons.arrow_forward,
-                                  color: Colors.white.withOpacity(0.8),
-                                  size: 18,
-                                ),
-                              ],
-                            ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 24),
-                        
+
                         // Link para registro
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -264,13 +306,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextButton(
                               onPressed: () {
                                 AppNavigation.navigateToReplacement(
-                                  context, 
+                                  context,
                                   const RegisterScreen(),
                                 );
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: AppTheme.primaryPurple,
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
                               ),
                               child: const Text(
                                 'Crie uma agora',
@@ -292,4 +335,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-} 
+}

@@ -143,10 +143,22 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
       });
     }
 
-    if (index == 4) {
-      Navigator.pushNamed(context, '/profile');
-    } else if (index == 3) {
-      Navigator.pushNamed(context, '/messages');
+    // Navegar para as diferentes telas
+    switch (index) {
+      case 0: // Início - já estamos na tela TikTok
+        break;
+      case 1: // Descobrir
+        Navigator.pushNamed(context, '/explore');
+        break;
+      case 2: // Criar
+        // Implementar a lógica para criar vídeo
+        break;
+      case 3: // Mensagens
+        Navigator.pushNamed(context, '/messages');
+        break;
+      case 4: // Perfil
+        Navigator.pushNamed(context, '/profile');
+        break;
     }
   }
 

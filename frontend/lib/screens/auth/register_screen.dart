@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/navigation.dart';
+import '../../services/auth_service.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,15 +15,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRegister() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = AuthService();
+      final response = await authService.register(
+        _nameController.text,
+        _emailController.text,
+        _usernameController.text,
+        _passwordController.text,
+      );
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/tiktok');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -63,9 +100,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 16),
-                    
+
                     // Subtítulo
                     const Center(
                       child: Text(
@@ -77,9 +114,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Campo Nome
                     const Text(
                       'Nome completo',
@@ -111,9 +148,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Campo Email
                     const Text(
                       'Email',
@@ -149,9 +186,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
+                    // Campo Nome de Usuário
+                    const Text(
+                      'Nome de usuário',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        hintText: 'Escolha um nome de usuário',
+                        fillColor: Colors.grey[50],
+                        filled: true,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor, insira um nome de usuário';
+                        }
+                        return null;
+                      },
+                    ),
+
+                    const SizedBox(height: 24),
+
                     // Campo Senha
                     const Text(
                       'Senha',
@@ -178,8 +249,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword 
-                                ? Icons.visibility_outlined 
+                            _obscurePassword
+                                ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
                             color: Colors.grey,
                           ),
@@ -200,54 +271,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return null;
                       },
                     ),
-                    
+
                     const SizedBox(height: 40),
-                    
+
                     // Botão de Cadastro
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // Implementar lógica de cadastro aqui
-                            // Por enquanto, apenas navegamos para a tela de login
-                            AppNavigation.navigateToReplacement(
-                              context, 
-                              const LoginScreen(),
-                            );
-                          }
-                        },
+                        onPressed: _isLoading ? null : _handleRegister,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryPurple,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Criar conta',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Criar conta',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.arrow_forward,
+                                    color: Colors.white.withOpacity(0.8),
+                                    size: 18,
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white.withOpacity(0.8),
-                              size: 18,
-                            ),
-                          ],
-                        ),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Link para login
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -261,7 +332,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         TextButton(
                           onPressed: () {
                             AppNavigation.navigateToReplacement(
-                              context, 
+                              context,
                               const LoginScreen(),
                             );
                           },
@@ -287,4 +358,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-} 
+}
