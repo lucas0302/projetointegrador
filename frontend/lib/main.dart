@@ -6,6 +6,7 @@ import 'screens/auth/register_screen.dart';
 import 'screens/video/feed_screen.dart';
 import 'screens/video/tiktok_feed_screen.dart';
 import 'screens/profile/profile_screen.dart';
+import 'screens/messages/messages_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/feed': (context) => const FeedScreen(),
         '/tiktok': (context) => const TikTokFeedScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/messages': (context) => const MessagesScreen(),
       },
     );
   }

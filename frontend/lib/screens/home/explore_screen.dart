@@ -59,7 +59,7 @@ class ExploreScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Subtítulo da seção
               Text(
                 'Explore os melhores conteúdos selecionados para você',
@@ -69,7 +69,7 @@ class ExploreScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // Lista de vídeos
               ListView(
                 shrinkWrap: true,
@@ -78,7 +78,7 @@ class ExploreScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, '/tiktok'),
                     child: const VideoCard(
-                      thumbnail: 'assets/images/video1.jpg', 
+                      thumbnail: 'assets/images/video1.jpg',
                       title: 'Como montar um home office eficiente',
                       authorName: 'Ana Silva',
                       views: '45K visualizações',
@@ -90,8 +90,9 @@ class ExploreScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, '/tiktok'),
                     child: const VideoCard(
-                      thumbnail: 'assets/images/video2.jpg', 
-                      title: 'Review: Os melhores produtos para sua workstation',
+                      thumbnail: 'assets/images/video2.jpg',
+                      title:
+                          'Review: Os melhores produtos para sua workstation',
                       authorName: 'Ricardo Tech',
                       views: '32K visualizações',
                       likes: 189,
@@ -102,7 +103,7 @@ class ExploreScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, '/tiktok'),
                     child: const VideoCard(
-                      thumbnail: 'assets/images/video3.jpg', 
+                      thumbnail: 'assets/images/video3.jpg',
                       title: 'Aprenda a programar em 10 minutos por dia',
                       authorName: 'Camila Dev',
                       views: '102K visualizações',
@@ -114,7 +115,7 @@ class ExploreScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, '/tiktok'),
                     child: const VideoCard(
-                      thumbnail: 'assets/images/video4.jpg', 
+                      thumbnail: 'assets/images/video4.jpg',
                       title: 'Dicas para aumentar sua produtividade',
                       authorName: 'João Produtivo',
                       views: '28K visualizações',
@@ -164,4 +165,4 @@ class ExploreScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

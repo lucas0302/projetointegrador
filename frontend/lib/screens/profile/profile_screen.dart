@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/bottom_nav_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  int _selectedIndex = 4; // Índice da tela de perfil
 
   @override
   void dispose() {
@@ -21,6 +23,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _onNavTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 0) {
+      // Índice do item Início
+      Navigator.pushNamed(context, '/tiktok');
+    } else if (index == 3) {
+      // Índice do item Mensagens
+      Navigator.pushNamed(context, '/messages');
+    }
+  }
+
+  void _showMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildMenuItem(
+              icon: Icons.person_outline,
+              title: 'Perfil',
+              onTap: () {
+                Navigator.pop(context);
+                _showProfileInfo(context);
+              },
+            ),
+            _buildMenuItem(
+              icon: Icons.favorite_outline,
+              title: 'Curtidos',
+              onTap: () {
+                Navigator.pop(context);
+                // Implementar tela de curtidos
+              },
+            ),
+            _buildMenuItem(
+              icon: Icons.bookmark_outline,
+              title: 'Favoritos',
+              onTap: () {
+                Navigator.pop(context);
+                // Implementar tela de favoritos
+              },
+            ),
+            const Divider(),
+            _buildMenuItem(
+              icon: Icons.settings_outlined,
+              title: 'Configurações',
+              onTap: () {
+                Navigator.pop(context);
+                _showSettingsInfo(context);
+              },
+            ),
+            const Divider(),
+            _buildMenuItem(
+              icon: Icons.exit_to_app,
+              title: 'Sair',
+              isLogout: true,
+              onTap: () {
+                Navigator.pop(context);
+                // Implementar logout
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -31,13 +106,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Minha Conta',
+          'Perfil',
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onPressed: () {
+              _showMenu(context);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -66,8 +149,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const CircleAvatar(
                         radius: 40,
                         backgroundColor: Colors.grey,
-                        backgroundImage: NetworkImage(
-                          'https://randomuser.me/api/portraits/men/32.jpg',
+                        backgroundImage: AssetImage(
+                          'assets/images/profiles/1.jpg',
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -126,6 +209,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: _selectedIndex,
+        onTap: _onNavTap,
+      ),
     );
   }
 
@@ -161,68 +248,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder:
-          (context) => Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Informações Pessoais',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Atualize suas informações pessoais',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  const SizedBox(height: 24),
-                  _buildTextField(label: 'Nome', value: 'João'),
-                  const SizedBox(height: 16),
-                  _buildTextField(label: 'Sobrenome', value: 'Silva'),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    label: 'Email',
-                    value: 'joao.silva@example.com',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(label: 'Telefone', value: '(11) 98765-4321'),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(117, 71, 209, 1),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        'Salvar Alterações',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(221, 255, 255, 255),
-                        ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Informações Pessoais',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const Text(
+                'Atualize suas informações pessoais',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              _buildTextField(label: 'Nome', value: 'João'),
+              const SizedBox(height: 16),
+              _buildTextField(label: 'Sobrenome', value: 'Silva'),
+              const SizedBox(height: 16),
+              _buildTextField(
+                label: 'Email',
+                value: 'joao.silva@example.com',
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(label: 'Telefone', value: '(11) 98765-4321'),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(117, 71, 209, 1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1,
                       ),
                     ),
                   ),
-                ],
+                  child: Text(
+                    'Salvar Alterações',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: const Color.fromARGB(221, 255, 255, 255),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -233,149 +319,147 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder:
-          (context) => Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Configurações da Conta',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Gerencie suas preferências e segurança',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Idioma',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedLanguage,
-                        isExpanded: true,
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        items:
-                            [
-                              'Português (Brasil)',
-                              'English (US)',
-                              'Español',
-                            ].map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedLanguage = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Senha atual',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _currentPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Nova senha',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _newPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Confirmar nova senha',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(117, 71, 209, 1),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: Colors.grey.shade300,
-                            width: 1,
-                          ),
-                        ),
-                      ),
-                      child: const Text(
-                        'Atualizar Configurações',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(221, 255, 255, 255),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Configurações da Conta',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ),
+              const Text(
+                'Gerencie suas preferências e segurança',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Idioma',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedLanguage,
+                    isExpanded: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    items: [
+                      'Português (Brasil)',
+                      'English (US)',
+                      'Español',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedLanguage = newValue!;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Senha atual',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _currentPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Nova senha',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _newPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Confirmar nova senha',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _confirmPasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(117, 71, 209, 1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: const Text(
+                    'Atualizar Configurações',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(221, 255, 255, 255),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+        ),
+      ),
     );
   }
 

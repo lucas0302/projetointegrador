@@ -16,7 +16,7 @@ class _FeedScreenState extends State<FeedScreen> {
   final List<Map<String, dynamic>> _videos = [
     {
       'author': 'Ana Silva',
-      'description': 'Como montar um home office eficiente com poucos recursos',
+      'description': 'testetestesteastesfsdausaghashkjdasdhasdaskaa',
       'likes': 1452,
       'comments': 87,
       'shares': 32,
@@ -31,7 +31,7 @@ class _FeedScreenState extends State<FeedScreen> {
       'isFollowing': true,
     },
     {
-      'author': 'Camila Dev',
+      'author': 'Camila ',
       'description': 'Aprenda a programar em Flutter em 10 minutos por dia #programação #flutter #dev',
       'likes': 3271,
       'comments': 124,
