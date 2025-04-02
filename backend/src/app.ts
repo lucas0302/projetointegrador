@@ -2,10 +2,8 @@ import 'reflect-metadata';
 import 'express-async-errors';
 import express, { Express } from 'express';
 import cors from 'cors';
-import { handleApplicationErrors } from './middlewares';
-import {
-  usersRouter,
-} from './routers';
+import { handleApplicationErrors } from './middlewares/error.middleware';
+import { router } from './routers/index';
 import { loadEnv, connectDb, disconnectDB } from './config';
 import path from 'path';
 
@@ -17,6 +15,7 @@ app
   .use(cors())
   .use(express.json())
   .get('/health', (_req, res) => res.send('OK!'))
+  .use(router)
   .use(handleApplicationErrors);
 
 export function init(): Promise<Express> {
