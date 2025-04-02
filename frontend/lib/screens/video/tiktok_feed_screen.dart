@@ -252,18 +252,6 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
                           ),
                           const SizedBox(height: 16),
                           _buildActionButton(
-                            icon: Icons.comment_outlined,
-                            label: video['comments'],
-                            onTap: () {},
-                          ),
-                          const SizedBox(height: 16),
-                          _buildActionButton(
-                            icon: Icons.share_outlined,
-                            label: video['shares'],
-                            onTap: () {},
-                          ),
-                          const SizedBox(height: 16),
-                          _buildActionButton(
                             icon:
                                 _isBookmarked
                                     ? Icons.bookmark

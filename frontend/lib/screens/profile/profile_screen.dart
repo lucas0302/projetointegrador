@@ -99,8 +99,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const Divider(),
                       _buildMenuItem(
-                        icon: Icons.payment_outlined,
-                        title: 'Pagamento',
+                        icon: Icons.bookmark_outline,
+                        title: 'Favoritos',
                         onTap: () {},
                       ),
                       const Divider(),
