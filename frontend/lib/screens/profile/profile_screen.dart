@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/bottom_nav_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,6 +19,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   int _selectedIndex = 4; // Índice da tela de perfil
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
+  }
+
+  Future<void> _loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? imagePath = prefs.getString('profile_image_path');
+
+    if (imagePath != null) {
+      setState(() {
+        _imageFile = File(imagePath);
+      });
+    }
+  }
+
+  Future<void> _saveProfileImage(String imagePath) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profile_image_path', imagePath);
+  }
 
   @override
   void dispose() {
@@ -23,6 +52,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+
+        // Salvar o caminho da imagem
+        await _saveProfileImage(pickedFile.path);
+      }
+    } catch (e) {
+      print('Erro ao selecionar imagem: $e');
+    }
   }
 
   void _onNavTap(int index) {
@@ -55,22 +106,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 Navigator.pop(context);
                 _showProfileInfo(context);
-              },
-            ),
-            _buildMenuItem(
-              icon: Icons.favorite_outline,
-              title: 'Curtidos',
-              onTap: () {
-                Navigator.pop(context);
-                // Implementar tela de curtidos
-              },
-            ),
-            _buildMenuItem(
-              icon: Icons.bookmark_outline,
-              title: 'Favoritos',
-              onTap: () {
-                Navigator.pop(context);
-                // Implementar tela de favoritos
               },
             ),
             const Divider(),
@@ -113,101 +148,162 @@ class _ProfileScreenState extends State<ProfileScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              _showMenu(context);
-            },
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Gerencie suas informações, pedidos e preferências',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Coluna da foto e informações do usuário
+                    Column(
+                      children: [
+                        // Foto de perfil com botão de edição
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            GestureDetector(
+                              onTap: _pickImage,
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: _imageFile != null
+                                    ? FileImage(_imageFile!)
+                                    : const AssetImage(
+                                            'assets/images/profiles/1.jpg')
+                                        as ImageProvider,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue,
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Nome de usuário
+                        const Text(
+                          '@joao.dev',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Nome completo
+                        const Text(
+                          'João Silva',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    // Coluna das estatísticas e botão
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Estatísticas
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildStatColumn('Seguindo', '150'),
+                              const SizedBox(width: 32),
+                              _buildStatColumn('Seguidores', '1.2K'),
+                            ],
+                          ),
+                          const SizedBox(height: 50),
+                          // Botão de editar perfil
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _showMenu(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 4),
+                                  side: BorderSide(color: Colors.grey.shade300),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Editar Perfil',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // Tabs de conteúdo
+          Expanded(
+            child: DefaultTabController(
+              length: 3,
+              child: Column(
+                children: [
+                  const TabBar(
+                    tabs: [
+                      Tab(icon: Icon(Icons.grid_on)),
+                      Tab(icon: Icon(Icons.favorite_border)),
+                      Tab(icon: Icon(Icons.bookmark_border)),
+                    ],
+                    labelColor: Colors.black,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: Colors.black,
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildGridContent('Vídeo'),
+                        _buildGridContent('Curtido'),
+                        _buildGridContent('Favorito'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Gerencie suas informações, pedidos e preferências',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-              const SizedBox(height: 24),
-              // Card do perfil
-              Card(
-                elevation: 0,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200, width: 1),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      // Avatar e nome
-                      const CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.grey,
-                        backgroundImage: AssetImage(
-                          'assets/images/profiles/1.jpg',
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'João Silva',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Text(
-                        'Cliente desde Março 2023',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                      const SizedBox(height: 24),
-                      // Menu de opções
-                      _buildMenuItem(
-                        icon: Icons.person_outline,
-                        title: 'Perfil',
-                        onTap: () {
-                          _showProfileInfo(context);
-                        },
-                      ),
-                      const Divider(),
-                      _buildMenuItem(
-                        icon: Icons.favorite_outline,
-                        title: 'Curtidos',
-                        onTap: () {},
-                      ),
-                      const Divider(),
-                      _buildMenuItem(
-                        icon: Icons.bookmark_outline,
-                        title: 'Favoritos',
-                        onTap: () {},
-                      ),
-                      const Divider(),
-                      _buildMenuItem(
-                        icon: Icons.settings_outlined,
-                        title: 'Configurações',
-                        onTap: () {
-                          _showSettingsInfo(context);
-                        },
-                      ),
-                      const Divider(),
-                      _buildMenuItem(
-                        icon: Icons.exit_to_app,
-                        title: 'Sair',
-                        isLogout: true,
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _selectedIndex,
@@ -474,6 +570,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
           vertical: 12,
         ),
       ),
+    );
+  }
+
+  Widget _buildStatColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridContent(String label) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(2),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 2,
+      ),
+      itemCount: 12,
+      itemBuilder: (context, index) {
+        return Container(
+          color: Colors.grey[300],
+          child: Center(
+            child: Text('$label ${index + 1}'),
+          ),
+        );
+      },
     );
   }
 }

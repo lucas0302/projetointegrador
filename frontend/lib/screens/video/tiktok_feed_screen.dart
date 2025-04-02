@@ -14,6 +14,7 @@ class TikTokFeedScreen extends StatefulWidget {
 class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
   final PageController _pageController = PageController();
   int _selectedIndex = 0;
+  int _currentVideoIndex = 0;
 
   // Lista de vídeos mock
   final List<Map<String, dynamic>> _videos = [
@@ -45,6 +46,48 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
       'isLiked': false,
       'isSaved': false,
     },
+    {
+      'videoUrl': kIsWeb
+          ? 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'
+          : 'assets/videos/vidio3.mp4',
+      'authorName': 'maria.tech',
+      'authorAvatar': 'assets/images/profiles/3.jpg',
+      'description': 'Aprendendo Flutter! 💻 #programação #mobile',
+      'likes': 3456,
+      'comments': 167,
+      'shares': 89,
+      'music': 'Música Original - maria.tech',
+      'isLiked': false,
+      'isSaved': false,
+    },
+    {
+      'videoUrl': kIsWeb
+          ? 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
+          : 'assets/videos/vidio4.mp4',
+      'authorName': 'pedro.code',
+      'authorAvatar': 'assets/images/profiles/4.jpg',
+      'description': 'Dicas de Flutter para iniciantes! 🎯 #flutter #dicas',
+      'likes': 7890,
+      'comments': 456,
+      'shares': 234,
+      'music': 'Música Original - pedro.code',
+      'isLiked': false,
+      'isSaved': false,
+    },
+    {
+      'videoUrl': kIsWeb
+          ? 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'
+          : 'assets/videos/vidio5.mp4',
+      'authorName': 'lucia.dev',
+      'authorAvatar': 'assets/images/profiles/5.jpg',
+      'description': 'Meu app em Flutter! 📱 #mobile #app',
+      'likes': 4321,
+      'comments': 289,
+      'shares': 156,
+      'music': 'Música Original - lucia.dev',
+      'isLiked': false,
+      'isSaved': false,
+    },
   ];
 
   @override
@@ -67,6 +110,11 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
 
   @override
   void dispose() {
+    // Pausar o vídeo atual antes de desmontar a tela
+    setState(() {
+      _currentVideoIndex = -1; // Forçar a pausa de todos os vídeos
+    });
+
     _pageController.dispose();
 
     // Restaurar orientações e barras do sistema
@@ -84,11 +132,28 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
     setState(() {
       _selectedIndex = index;
     });
+
+    // Pausar o vídeo atual antes de navegar
+    if (index != 0) {
+      // Se não for a tela de feed
+      // Forçar o vídeo atual a pausar
+      setState(() {
+        _currentVideoIndex =
+            -1; // Definir um índice inválido para forçar a pausa
+      });
+    }
+
     if (index == 4) {
       Navigator.pushNamed(context, '/profile');
     } else if (index == 3) {
       Navigator.pushNamed(context, '/messages');
     }
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentVideoIndex = index;
+    });
   }
 
   @override
@@ -98,9 +163,7 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
       body: PageView.builder(
         controller: _pageController,
         scrollDirection: Axis.vertical,
-        onPageChanged: (index) {
-          // No state update needed since we're not using the page index
-        },
+        onPageChanged: _onPageChanged,
         itemCount: _videos.length,
         itemBuilder: (context, index) {
           return TikTokVideoPlayer(
@@ -125,6 +188,7 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
                 _videos[index]['isSaved'] = !_videos[index]['isSaved'];
               });
             },
+            isCurrentVideo: index == _currentVideoIndex,
           );
         },
       ),
@@ -149,6 +213,7 @@ class TikTokVideoPlayer extends StatefulWidget {
   final bool isSaved;
   final VoidCallback onLike;
   final VoidCallback onSave;
+  final bool isCurrentVideo;
 
   const TikTokVideoPlayer({
     Key? key,
@@ -164,6 +229,7 @@ class TikTokVideoPlayer extends StatefulWidget {
     required this.isSaved,
     required this.onLike,
     required this.onSave,
+    required this.isCurrentVideo,
   }) : super(key: key);
 
   @override
@@ -182,17 +248,28 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
     _initializeVideo();
   }
 
+  @override
+  void didUpdateWidget(TikTokVideoPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isCurrentVideo != oldWidget.isCurrentVideo) {
+      if (widget.isCurrentVideo) {
+        _controller.play();
+        _controller.setVolume(1.0);
+      } else {
+        _controller.pause();
+        _controller.setVolume(0.0);
+      }
+    }
+  }
+
   Future<void> _initializeVideo() async {
     try {
       if (kIsWeb) {
-        // Para web, vamos usar uma URL direta do vídeo
         _controller = VideoPlayerController.network(widget.videoUrl);
       } else {
-        // Para mobile, usamos o asset
         _controller = VideoPlayerController.asset(widget.videoUrl);
       }
 
-      // Adiciona listener para erros
       _controller.addListener(() {
         final error = _controller.value.errorDescription;
         if (error != null && mounted) {
@@ -210,9 +287,16 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
           _isInitialized = true;
           _error = null;
         });
-        _controller.play();
+
+        if (widget.isCurrentVideo) {
+          _controller.play();
+          _controller.setVolume(1.0);
+        } else {
+          _controller.pause();
+          _controller.setVolume(0.0);
+        }
+
         _controller.setLooping(true);
-        _controller.setVolume(1.0);
       }
     } catch (e) {
       if (mounted) {
@@ -231,10 +315,16 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
   }
 
   void _togglePlay() {
-    if (!_isInitialized) return;
+    if (!_isInitialized || !widget.isCurrentVideo) return;
     setState(() {
       _isPlaying = !_isPlaying;
-      _isPlaying ? _controller.play() : _controller.pause();
+      if (_isPlaying) {
+        _controller.play();
+        _controller.setVolume(1.0);
+      } else {
+        _controller.pause();
+        _controller.setVolume(0.0);
+      }
     });
   }
 
