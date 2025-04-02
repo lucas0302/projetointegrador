@@ -6,8 +6,8 @@ import '../../widgets/app_button.dart';
 import '../auth/login_screen.dart';
 import '../auth/register_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class HomeScreen extends StatelessWidget {
                       TextButton(
                         onPressed: () {
                           AppNavigation.navigateTo(
-                            context, 
+                            context,
                             const LoginScreen(),
                           );
                         },
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                       ElevatedButton(
                         onPressed: () {
                           AppNavigation.navigateTo(
-                            context, 
+                            context,
                             const RegisterScreen(),
                           );
                         },
@@ -66,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Conteúdo principal
             Expanded(
               child: SingleChildScrollView(
@@ -74,7 +74,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 40),
-                    
+
                     // Texto de boas-vindas
                     const Column(
                       children: [
@@ -90,9 +90,9 @@ class HomeScreen extends StatelessWidget {
                         AppLogoText(fontSize: 36),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // Texto de descrição
                     const Text(
                       'Assista, curta e compartilhe vídeos em uma plataforma simples e moderna.',
@@ -103,36 +103,25 @@ class HomeScreen extends StatelessWidget {
                         height: 1.5,
                       ),
                     ),
-                    
+
                     const SizedBox(height: 60),
-                    
-                    // Botões de ação
+
+                    // Botão de Entrar na sua conta
                     AppButton(
                       text: 'Entrar na sua conta',
                       icon: Icons.person_outline,
                       onPressed: () {
                         AppNavigation.navigateTo(
-                          context, 
+                          context,
                           const LoginScreen(),
                         );
-                      },
-                    ),
-                    
-                    const SizedBox(height: 16),
-                    
-                    AppButton(
-                      text: 'Explorar vídeos',
-                      icon: Icons.videocam_outlined,
-                      isOutlined: true,
-                      onPressed: () {
-                        // Implementar navegação para exploração de vídeos
                       },
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             // Rodapé
             const Padding(
               padding: EdgeInsets.all(16.0),
@@ -149,4 +138,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

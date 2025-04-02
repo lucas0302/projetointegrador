@@ -147,16 +147,13 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
     switch (index) {
       case 0: // Início - já estamos na tela TikTok
         break;
-      case 1: // Descobrir
-        Navigator.pushNamed(context, '/explore');
-        break;
-      case 2: // Criar
+      case 1: // Criar
         // Implementar a lógica para criar vídeo
         break;
-      case 3: // Mensagens
+      case 2: // Mensagens
         Navigator.pushNamed(context, '/messages');
         break;
-      case 4: // Perfil
+      case 3: // Perfil
         Navigator.pushNamed(context, '/profile');
         break;
     }

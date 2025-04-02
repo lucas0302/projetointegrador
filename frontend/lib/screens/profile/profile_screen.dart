@@ -18,7 +18,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  int _selectedIndex = 4; // Índice da tela de perfil
+  int _selectedIndex =
+      3; // Índice da tela de perfil (era 4, agora é 3 após remover o botão "Para Você")
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
@@ -83,10 +84,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (index == 0) {
       // Índice do item Início
       Navigator.pushNamed(context, '/tiktok');
-    } else if (index == 3) {
+    } else if (index == 2) {
       // Índice do item Mensagens
       Navigator.pushNamed(context, '/messages');
     }
+    // Não precisamos navegar para o perfil quando o índice é 3, pois já estamos na tela de perfil
   }
 
   void _showMenu(BuildContext context) {

@@ -9,13 +9,14 @@ class MessagesScreen extends StatefulWidget {
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
-  int _selectedIndex = 3; // Índice da tela de mensagens
+  int _selectedIndex =
+      2; // Índice da tela de mensagens (era 3, agora é 2 após remover o botão "Para Você")
 
   void _onNavTap(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 4) {
+    if (index == 3) {
       // Índice do item Perfil
       Navigator.pushNamed(context, '/profile');
     } else if (index == 0) {
