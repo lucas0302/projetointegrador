@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/bottom_nav_bar.dart';
+import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -18,11 +19,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  int _selectedIndex = 4; // Índice da tela de perfil
+  int _selectedIndex =
+      3; // Índice da tela de perfil (era 4, agora é 3 após remover o botão "Para Você")
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -83,9 +86,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (index == 0) {
       // Índice do item Início
       Navigator.pushNamed(context, '/tiktok');
-    } else if (index == 3) {
+    } else if (index == 2) {
       // Índice do item Mensagens
       Navigator.pushNamed(context, '/messages');
+    }
+    // Não precisamos navegar para o perfil quando o índice é 3, pois já estamos na tela de perfil
+  }
+
+  Future<void> _handleLogout() async {
+    try {
+      await _authService.logout();
+
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/welcome', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer logout: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -124,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               isLogout: true,
               onTap: () {
                 Navigator.pop(context);
-                // Implementar logout
+                _handleLogout();
               },
             ),
           ],

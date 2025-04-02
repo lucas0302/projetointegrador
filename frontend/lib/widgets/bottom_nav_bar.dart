@@ -23,7 +23,6 @@ class BottomNavBar extends StatelessWidget {
       unselectedLabelStyle: const TextStyle(fontSize: 12),
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Início'),
-        BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Descobrir'),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_box_outlined),
           label: 'Criar',
