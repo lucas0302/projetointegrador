@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/bottom_nav_bar.dart';
+import '../../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -91,6 +93,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Não precisamos navegar para o perfil quando o índice é 3, pois já estamos na tela de perfil
   }
 
+  Future<void> _handleLogout() async {
+    try {
+      await _authService.logout();
+
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/welcome', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao fazer logout: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+  }
+
   void _showMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -126,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               isLogout: true,
               onTap: () {
                 Navigator.pop(context);
-                // Implementar logout
+                _handleLogout();
               },
             ),
           ],

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../utils/token_storage.dart';
 
 class AuthService {
   static const String baseUrl = 'http://localhost:5001/auth';
@@ -16,7 +17,18 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+
+        // Salvar dados de autenticação
+        await TokenStorage.saveAuthData(
+          token: data['token'],
+          userId: data['user']['id'],
+          username: data['user']['username'],
+          name: data['user']['name'],
+          email: data['user']['email'],
+        );
+
+        return data;
       } else {
         throw Exception(
             json.decode(response.body)['error'] ?? 'Failed to login');
@@ -45,13 +57,48 @@ class AuthService {
       );
 
       if (response.statusCode == 201) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+
+        // Salvar dados de autenticação
+        await TokenStorage.saveAuthData(
+          token: data['token'],
+          userId: data['user']['id'],
+          username: data['user']['username'],
+          name: data['user']['name'],
+          email: data['user']['email'],
+        );
+
+        return data;
       } else {
         throw Exception(
             json.decode(response.body)['error'] ?? 'Failed to register');
       }
     } catch (e) {
       throw Exception('Failed to connect to server');
+    }
+  }
+
+  // Função de logout
+  Future<void> logout() async {
+    try {
+      final token = await TokenStorage.getToken();
+
+      // Chama o backend para registrar o logout (opcional)
+      await http.post(
+        Uri.parse('$baseUrl/logout'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Independente da resposta do servidor, limpa os dados locais
+      await TokenStorage.clearAuthData();
+    } catch (e) {
+      // Mesmo se o servidor estiver indisponível, limpa os dados locais
+      await TokenStorage.clearAuthData();
+      // Pode logar o erro se necessário
+      print('Erro durante logout: $e');
     }
   }
 }
