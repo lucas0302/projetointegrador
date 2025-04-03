@@ -6,6 +6,7 @@ import '../screens/home/tiktok_feed_screen.dart';
 import '../screens/home/feed_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/messages/messages_screen.dart';
+import '../screens/create/create_video_screen.dart';
 
 class AppRoutes {
   static Map<String, Widget Function(BuildContext)> routes = {
@@ -17,5 +18,6 @@ class AppRoutes {
     '/feed': (context) => const FeedScreen(),
     '/profile': (context) => const ProfileScreen(),
     '/messages': (context) => const MessagesScreen(),
+    '/create': (context) => const CreateVideoScreen(),
   };
 }
