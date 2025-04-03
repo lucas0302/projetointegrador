@@ -12,9 +12,33 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Garantir que o currentIndex seja válido (entre 0 e o número de itens - 1)
+    // Se for negativo ou muito grande, use 0 como padrão
+    final validIndex =
+        (currentIndex >= 0 && currentIndex <= 3) ? currentIndex : 0;
+
     return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
+      currentIndex: validIndex,
+      onTap: (index) async {
+        if (index == 1) {
+          // Índice 1 é o botão "Criar"
+          // Primeiro, notificar a tela principal para pausar o vídeo
+          onTap(-1); // Usamos um valor negativo como sinal para pausar o vídeo
+
+          // Navegar para a tela de criação e aguardar o resultado
+          final result = await Navigator.pushNamed(context, '/create');
+
+          // Ao retornar da tela de criação, verificar se precisa manter os vídeos pausados
+          if (result is Map && (result as Map).containsKey('pauseVideos')) {
+            if (result['pauseVideos'] == true) {
+              // Mantém os vídeos pausados
+              onTap(-1);
+            }
+          }
+        } else {
+          onTap(index);
+        }
+      },
       type: BottomNavigationBarType.fixed,
       backgroundColor: Colors.white,
       selectedItemColor: Colors.black,

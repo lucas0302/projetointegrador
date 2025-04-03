@@ -129,6 +129,19 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
   }
 
   void _onNavTap(int index) {
+    // Pausar o vídeo quando recebido o valor -1 (botão Criar)
+    if (index == -1) {
+      setState(() {
+        _currentVideoIndex = -1; // Forçar a pausa de todos os vídeos
+      });
+      return;
+    }
+
+    // Garantir que o índice seja válido
+    if (index < 0 || index > 3) {
+      return;
+    }
+
     setState(() {
       _selectedIndex = index;
     });
@@ -146,9 +159,6 @@ class _TikTokFeedScreenState extends State<TikTokFeedScreen> {
     // Navegar para as diferentes telas
     switch (index) {
       case 0: // Início - já estamos na tela TikTok
-        break;
-      case 1: // Criar
-        // Implementar a lógica para criar vídeo
         break;
       case 2: // Mensagens
         Navigator.pushNamed(context, '/messages');
@@ -260,13 +270,21 @@ class _TikTokVideoPlayerState extends State<TikTokVideoPlayer> {
   @override
   void didUpdateWidget(TikTokVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    // Se mudou o status de vídeo atual ou se não for mais o vídeo atual
     if (widget.isCurrentVideo != oldWidget.isCurrentVideo) {
       if (widget.isCurrentVideo) {
         _controller.play();
         _controller.setVolume(1.0);
+        setState(() {
+          _isPlaying = true;
+        });
       } else {
         _controller.pause();
         _controller.setVolume(0.0);
+        setState(() {
+          _isPlaying = false;
+        });
       }
     }
   }
