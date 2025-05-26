@@ -1,0 +1,1 @@
+export { handleApplicationErrors } from './error.middleware'; 
